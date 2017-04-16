@@ -8,12 +8,12 @@ from django.utils.text import Truncator
 
 class User(models.Model):
     uuid             = models.UUIDField(default=uuid4, primary_key=True)
-    username         = models.CharField(max_length=256, db_index=True)
-    display_name     = models.CharField(max_length=256)
-    service_id       = models.CharField(max_length=256)
-    service_username = models.CharField(max_length=256)
-    service_atoken   = models.CharField(max_length=256)
-    service_rtoken   = models.CharField(max_length=256, null=True, blank=True)
+    username         = models.CharField(max_length=255, db_index=True)
+    display_name     = models.CharField(max_length=255)
+    service_id       = models.CharField(max_length=255)
+    service_username = models.CharField(max_length=255)
+    service_atoken   = models.CharField(max_length=255)
+    service_rtoken   = models.CharField(max_length=255, null=True, blank=True)
     service_etoken   = models.DateTimeField(null=True, blank=True)
     last_login       = models.DateTimeField(auto_now_add=True)
 
@@ -29,7 +29,7 @@ class User(models.Model):
 class Repo(models.Model):
     uuid    = models.UUIDField(default=uuid4, primary_key=True)
     user    = models.ForeignKey(User)
-    path    = models.CharField(max_length=256, db_index=True)
+    path    = models.CharField(max_length=255, db_index=True)
     enabled = models.BooleanField()
     public  = models.BooleanField()
 
@@ -37,26 +37,13 @@ class Repo(models.Model):
 class Build(models.Model):
     uuid                = models.UUIDField(default=uuid4, primary_key=True)
     repo                = models.ForeignKey(Repo)
-    docker_image        = models.CharField(max_length=256, null=True, blank=True)
-    ref                 = models.CharField(max_length=256)
-    commit              = models.CharField(max_length=256)
-    message             = models.CharField(max_length=256)
-    author_username     = models.CharField(max_length=256)
-    author_display_name = models.CharField(max_length=256)
-    status              = models.CharField(max_length=256)
+    docker_image        = models.CharField(max_length=255, null=True, blank=True)
+    ref                 = models.CharField(max_length=255)
+    commit              = models.CharField(max_length=255)
+    message             = models.CharField(max_length=255)
+    author_username     = models.CharField(max_length=255)
+    author_display_name = models.CharField(max_length=255)
+    status              = models.CharField(max_length=255)
     output              = models.TextField()
     datetime_start      = models.DateTimeField(null=True, blank=True)
     datetime_end        = models.DateTimeField(null=True, blank=True)
-
-    def get_build_steps(self, after=0):
-        steps = []
-
-        for step_body in self.output.split("\x1d"):
-            step_title = Truncator(step_body[:step_body.find("\n")].rstrip()).chars(80)
-
-            steps.append({
-                "title" : step_title,
-                "body"  : step_body
-            })
-
-        return steps[after:] if after > 0 else steps
