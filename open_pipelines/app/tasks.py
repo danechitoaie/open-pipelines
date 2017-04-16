@@ -65,9 +65,15 @@ def run_pipeline(build_uuid):
             )
 
             with open(git_SCRIPT_path, "w") as f:
+                f.write("umask 000")
+                f.write("\n")            
+            
                 for c in service.get_git_cmds(build):
                     f.write(c)
                     f.write("\n")
+
+                f.write("chmod 777 $BUILD_DIR")
+                f.write("\n")            
 
             oauth_atoken = urllib.parse.quote(repo_user.service_atoken)
 
