@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Open Pipelines - Login{% endblock %}
+
+{% block body %}
+    <div class="op__login ui middle aligned center aligned grid">
+        <div class="column">
+            <h2 class="ui header">
+                <div class="content">
+                    Open Pipelines - Login
+                </div>
+            </h2>
+
+            <div class="ui large">
+                <div class="ui stacked segment">
+                    {% for service in services %}
+                        <a href="{% url 'login_with_service' service.get_id %}" class="ui fluid primary button">
+                            <i class="circular icon {{ service.get_id }}"></i>
+                            Login with {{ service.get_display_name }}
+                        </a>
+                    {% empty %}
+                        <div class="ui negative message">
+                            <p>No service enabled!</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,59 @@
+body {
+    background-color: #DADADA;
+}
+
+body > .grid {
+    height: 100%;
+}
+
+.op__login .column {
+    max-width: 450px;
+}
+
+.op__login .column .ui.stacked a {
+    margin: 0 0 20px 0;
+}
+
+.op__repos.ui.menu .item {
+    padding: 0.92857143em 0;
+}
+
+.op__repos .ui.wireframe.image {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.open_pipelines_yml .CodeMirror {
+    height: 190px;
+    width: 100%;
+}
+
+.op__404 .column {
+    max-width: 550px;
+}
+
+.op__404 .column .ui.stacked.segment .ui.icon.message {
+    text-align: left;
+}
+
+.op__build h2.header {
+    padding: 20px 0 0 0;
+}
+
+.op__build .column {
+    max-width: 1024px;
+}
+
+.op__build .column .op__build__status .content,
+.op__build .column .op__build__info .ui.message,
+.op__build .column .op__build__logs .ui.stacked.segment {
+    text-align: left;
+}
+
+.op__build .column .op__build__logs {
+    margin: 20px 0 20px 0;
+}
+
+.op__build .column .op__build__logs .CodeMirror {
+    width: 100%;
+}

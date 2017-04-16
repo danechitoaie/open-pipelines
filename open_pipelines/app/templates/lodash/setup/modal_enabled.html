@@ -1,0 +1,43 @@
+<table class="ui black table">
+    <tbody>
+        <tr>
+            <td>
+                <div class="ui items form">
+                    <div class="item">
+                        <i class="world icon"></i> Webhook URL (use &quot;repository push&quot; trigger)
+                    </div>
+                    <div class="item disabled field">
+                        <input type="text" value="<%- webhook %>" disabled="">
+                    </div>
+                </div>
+
+                <div class="ui items form">
+                    <div class="item">
+                        <i class="code icon"></i> Sample open_pipelines.yml file
+                    </div>
+                    <div class="item open_pipelines_yml">
+                    </div>
+                </div>
+
+                <div class="ui items form">
+                    <div class="item">
+                        <div class="ui checkbox">
+                            <input type="checkbox">
+                            <label>Alow access to build results for unauthenticated users</label>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>
+                <div class="ui toggle checkbox">
+                    <input type="checkbox">
+                    <label>Enable Open Pipelines for this repository</label>
+                </div>
+            </th>
+        </tr>
+    </tfoot>
+</table>

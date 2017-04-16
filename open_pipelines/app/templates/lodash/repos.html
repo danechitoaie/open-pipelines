@@ -1,0 +1,42 @@
+<table class="ui black table">
+    <thead>
+        <tr>
+            <th colspan="2">GIT Repositories</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% _.forEach(repos, function(r) { %>
+        <tr>
+            <td>
+                <a class="repo__status" data-repo-path="<%- r.path %>" href="<%- r.href %>" target="_blank">
+                    <% if (r.enabled) { %>
+                        <i class="green check circle outline icon"></i>
+                    <% } else { %>
+                        <i class="grey radio icon"></i>
+                    <% } %>
+                    <%- r.name %>
+                </a>
+            </td>
+            <td class="right aligned">
+                <button data-repo-path="<%- r.path %>" data-repo-name="<%- r.name %>" data-repo-url="<%- r.url %>" class="ui primary icon button">
+                    <i class="configure icon"></i>
+                </button>
+            </td>
+        </tr>
+        <% }); %>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">
+                <div class="ui right floated pagination menu">
+                    <a<% if (prev_href) { %> href="<%- prev_href %>"<% } %> class="icon item<% if (!prev_href) { %> disabled<% } %>">
+                        <i class="left chevron icon"></i>
+                    </a>
+                    <a<% if (next_href) { %> href="<%- next_href %>"<% } %> class="icon item<% if (!next_href) { %> disabled<% } %>">
+                        <i class="right chevron icon"></i>
+                    </a>
+                </div>
+            </th>
+        </tr>
+    </tfoot>
+</table>

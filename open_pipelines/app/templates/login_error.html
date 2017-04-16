@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Open Pipelines - Login{% endblock %}
+
+{% block body %}
+    <div class="op__login ui middle aligned center aligned grid">
+        <div class="column">
+            <h2 class="ui header">
+                <div class="content">
+                    Open Pipelines - Login
+                </div>
+            </h2>
+
+            <div class="ui large">
+                <div class="ui stacked segment">
+                    <div class="ui negative message">
+                        <div class="header">Error</div>
+                        <p>Login failed</p>
+                    </div>
+                    
+                    <a href="{% url 'login' %}" class="ui fluid button">
+                        <i class="circular icon arrow left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

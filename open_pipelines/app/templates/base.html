@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load staticfiles %}
+
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+        <title>{% block title %}{% endblock %}</title>
+
+        <link rel="stylesheet" type="text/css" href="{% static 'css/semantic.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/codemirror.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/app.css' %}">
+
+        <script src="{% static 'js/jquery.js' %}"></script>
+        <script src="{% static 'js/semantic.js' %}"></script>
+        <script src="{% static 'js/codemirror/codemirror.js' %}"></script>
+        <script src="{% static 'js/codemirror/mode/yaml.js' %}"></script>
+        <script src="{% static 'js/codemirror/mode/shell.js' %}"></script>
+        <script src="{% static 'js/lodash.js' %}"></script>
+        <script src="{% static 'js/moment.js' %}"></script>
+    </head>
+
+    <body>
+        {% block body %}{% endblock %}
+    </body>
+</html>

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}Open Pipelines{% endblock %}
+
+{% block body %}
+    <div class="op__repos ui borderless main menu">
+        <div class="ui text container">
+            <div class="header item">
+                <i class="circular icon {{ request.user.service_id }}"></i>
+                {{ request.user.display_name }}
+            </div>
+
+            <a href="{% url 'logout' %}" class="ui right floated item">
+                <i class="power icon"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <div class="op__repos ui text container">
+        <div class="op__repos__content ui segment">
+            <div class="ui active inverted dimmer">
+                <div class="ui text loader">Loading...</div>
+            </div>
+
+            <table class="ui black table" data-request-url="{% url 'repos_json' %}">
+                <thead>
+                    <tr>
+                        <th>GIT Repositories</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <img class="ui wireframe image" src="{% static 'images/short-paragraph.png' %}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img class="ui wireframe image" src="{% static 'images/short-paragraph.png' %}">
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>
+                            <div class="ui right floated pagination menu">
+                                <a class="icon item">
+                                    <i class="left chevron icon"></i>
+                                </a>
+                                <a class="icon item">
+                                    <i class="right chevron icon"></i>
+                                </a>
+                            </div>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- modal -->
+        <div class="op__repos__modal ui modal">
+            <div class="header"></div>
+            <div class="content"></div>
+            <div class="actions">
+                <div class="ui black deny button">Close</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- lodash/template : loader -->
+    <script type="lodash/template" id="script-template-loader">
+        {% include "lodash/loader.html" %}
+    </script>
+
+    <!-- lodash/template : repos -->
+    <script type="lodash/template" id="script-template-repos">
+        {% include "lodash/repos.html" %}
+    </script>
+
+    <!-- lodash/template : modal_loading -->
+    <script type="lodash/template" id="script-template-modal-loading">
+        {% include "lodash/setup/modal_loading.html" %}
+    </script>
+
+    <!-- lodash/template : modal_disabled -->
+    <script type="lodash/template" id="script-template-modal-disabled">
+        {% include "lodash/setup/modal_disabled.html" %}
+    </script>
+
+    <!-- lodash/template : modal_enabled -->
+    <script type="lodash/template" id="script-template-modal-enabled">
+        {% include "lodash/setup/modal_enabled.html" %}
+    </script>
+
+    <!-- lodash/template : error -->
+    <script type="lodash/template" id="script-template-error">
+        {% include "lodash/error.html" %}
+    </script>
+
+    <script src="{% static 'js/app/index.js' %}"></script>
+{% endblock %}

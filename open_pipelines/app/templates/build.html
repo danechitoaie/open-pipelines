@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}Open Pipelines - Build{% endblock %}
+
+{% block body %}
+    <div class="op__build ui center aligned grid" data-build-url="{% url 'build_by_uuid_json' build_uuid %}">
+        <div class="column">
+            <h2 class="ui header">
+                Open Pipelines - Build #{{ build_uuid }}
+            </h2>
+
+            <div class="op__build__info ui large">
+                <div class="ui stacked segment">
+                    {% if build_status == "INPROGRESS" %}
+                        {% include "lodash/build/inprogress.html" %}
+                    {% elif build_status == "SUCCESSFUL" %}
+                        {% include "lodash/build/successful.html" %}
+                    {% elif build_status == "FAILED" %}
+                        {% include "lodash/build/failed.html" %}
+                    {% else %}
+                        {% include "lodash/build/unknown.html" %}
+                    {% endif %}
+
+                    <div class="op__build__info ui items">
+                        <div class="item" data-datetime-start="" data-datetime-elapsed="">
+                            <i class="wait icon"></i>
+                            <span>n\a</span>
+                        </div>
+                        <div class="item" data-docker-image="">
+                            <i class="tasks icon"></i>
+                            <span>n\a</span>
+                        </div>
+                        <div class="item">
+                            <i class="user icon"></i>
+                            <span>Push by <a href="{{ build_author_href }}" target="_blank">{{ build_author_display_name }}</a></span>
+                        </div>
+                        <div class="item">
+                            <i class="fork icon"></i>
+                            <span>{{ build_ref }} ({{ build_commit }})</span>
+                        </div>
+                        <div class="ui message">
+                            <div class="header">Message</div>
+                            <p>{{ build_message }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="op__build__logs ui large">
+                <div class="ui stacked segment">
+                    <div class="ui active inverted dimmer">
+                        <div class="ui text loader">Loading...</div>
+                    </div>
+
+                    <img class="ui wireframe image" src="{% static 'images/short-paragraph.png' %}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- lodash/template : build-status-inprogress -->
+    <script type="lodash/template" id="script-template-build-status-inprogress">
+        {% include "lodash/build/inprogress.html" %}
+    </script>
+
+    <!-- lodash/template : build-status-successful -->
+    <script type="lodash/template" id="script-template-build-status-successful">
+        {% include "lodash/build/successful.html" %}
+    </script>
+
+    <!-- lodash/template : build-status-failed -->
+    <script type="lodash/template" id="script-template-build-status-failed">
+        {% include "lodash/build/failed.html" %}
+    </script>
+
+    <!-- lodash/template : build-status-unknown -->
+    <script type="lodash/template" id="script-template-build-status-unknown">
+        {% include "lodash/build/unknown.html" %}
+    </script>
+
+    <!-- lodash/template : error -->
+    <script type="lodash/template" id="script-template-error">
+        {% include "lodash/error.html" %}
+    </script>
+
+    <script src="{% static 'js/app/builds.js' %}"></script>
+{% endblock %}

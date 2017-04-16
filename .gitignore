@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+node_modules/
+open_pipelines/static/dist/
+open_pipelines/logs/*.log
+
+.DS_Store
+db.sqlite3
+npm-debug.log
+yarn-error.log

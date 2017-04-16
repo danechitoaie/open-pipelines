@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Open Pipelines - Login{% endblock %}
+
+{% block body %}
+    <div class="op__404 ui middle aligned center aligned grid">
+        <div class="column">
+            <h2 class="ui header">
+                <div class="content">
+                    Open Pipelines - Not Found
+                </div>
+            </h2>
+
+            <div class="ui large">
+                <div class="ui stacked segment">
+                    <div class="ui icon message">
+                        <i class="desktop icon"></i>
+                        <div class="content">
+                            <div class="header">404 - Not Found</div>
+                            <p>The requested resource was not found on the server.</p>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'index' %}" class="ui fluid button">
+                        <i class="circular icon arrow left"></i> Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
