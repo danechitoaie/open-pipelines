@@ -85,7 +85,7 @@ $(document).ready(function() {
                     }
 
                     if (r.build_status === "INPROGRESS" && r.build_url_more !== null) {
-                        setTimeout(updateBuildProgress(codeMirror, r.build_url_more), 2000);
+                        setTimeout(updateBuildProgress(codeMirror, r.build_url_more), 1000);
                     }
 
                     return;
@@ -132,7 +132,7 @@ $(document).ready(function() {
                 codeMirror.execCommand("goDocEnd");
 
                 if (r.build_status === "INPROGRESS" && r.build_url_more !== null) {
-                    setTimeout(updateBuildProgress(codeMirror, r.build_url_more), 2000);
+                    setTimeout(updateBuildProgress(codeMirror, r.build_url_more), 1000);
                 }
 
                 return;

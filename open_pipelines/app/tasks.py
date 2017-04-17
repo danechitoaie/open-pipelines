@@ -147,7 +147,7 @@ def run_pipeline(build_uuid):
             tmp_buffer = ""
             for line in docker_container.logs(stream=True):
                 tmp_buffer += line
-                if tmp_buffer.count("\n") >= 20:
+                if tmp_buffer.count("\n") >= 10:
                     buff_index    = tmp_buffer.rfind("\n")
                     split_pos     = buff_index + 1
 
