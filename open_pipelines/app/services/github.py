@@ -188,6 +188,9 @@ class GitHubService(object):
             "next_href" : next_href,
         }
 
+    def get_commit_href(self, repo, commit_hash):
+        return "https://github.com/{0}/commit/{1}".format(repo.path, commit_hash)
+
     def parse_webhook_request(self, payload):
         try:
             json_payload = json.loads(payload)

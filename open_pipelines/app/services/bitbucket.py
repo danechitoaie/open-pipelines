@@ -220,6 +220,9 @@ class BitBucketService(object):
             "next_href" : next_href,
         }
 
+    def get_commit_href(self, repo, commit_hash):
+        return "https://bitbucket.org/{0}/commits/{1}".format(repo.path, commit_hash)
+
     def parse_webhook_request(self, payload):
         try:
             json_payload = json.loads(payload)

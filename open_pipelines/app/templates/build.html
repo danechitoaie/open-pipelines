@@ -10,7 +10,7 @@
                 Open Pipelines - Build #{{ build_uuid }}
             </h2>
 
-            <div class="op__build__info ui large">
+            <div class="ui large">
                 <div class="ui stacked segment">
                     {% if build_status == "INPROGRESS" %}
                         {% include "lodash/build/inprogress.html" %}
@@ -37,7 +37,7 @@
                         </div>
                         <div class="item">
                             <i class="fork icon"></i>
-                            <span>{{ build_ref }} ({{ build_commit }})</span>
+                            <span>{{ build_ref }} (<a href="{{ build_commit_href }}" target="_blank">{{ build_commit }}</a>)</span>
                         </div>
                         <div class="ui message">
                             <div class="header">Message</div>
@@ -77,6 +77,11 @@
     <!-- lodash/template : build-status-unknown -->
     <script type="lodash/template" id="script-template-build-status-unknown">
         {% include "lodash/build/unknown.html" %}
+    </script>
+
+    <!-- lodash/template : build-rerun -->
+    <script type="lodash/template" id="script-template-build-rerun">
+        {% include "lodash/build/rerun.html" %}
     </script>
 
     <!-- lodash/template : error -->

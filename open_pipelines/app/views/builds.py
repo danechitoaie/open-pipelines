@@ -16,6 +16,7 @@ import humanize
 # Open Pipelines
 from ..models   import Build
 from ..services import ServiceManager
+from ..tasks    import run_pipeline
 
 
 class BuildByUUIDView(View):
@@ -50,7 +51,8 @@ class BuildByUUIDView(View):
             "build_author_href"         : service.get_user_href(user),
             "build_author_display_name" : build.author_display_name,
             "build_ref"                 : build.ref,
-            "build_commit"              : build.commit,
+            "build_commit"              : build.commit[:7],
+            "build_commit_href"         : service.get_commit_href(repo, build.commit),
             "build_message"             : build.message,
         })
 
@@ -124,4 +126,56 @@ class BuildByUUIDJsonView(View):
             "build_docker_image"     : build.docker_image,
             "build_output"           : build_output,
             "build_url_more"         : build_url_more,
+        })
+
+    def post(self, request, build_uuid):
+        try:
+            build = Build.objects.get(pk=build_uuid)
+        except (ValueError, Build.DoesNotExist):
+            return JsonResponse({
+                "status" : "not_found"
+            }, status=404)
+
+        service_manager = ServiceManager()
+        repo            = build.repo
+        user            = repo.user
+
+        try:
+            service = service_manager.get_service(user.service_id)
+        except ServiceManager.DoesNotExist:
+            return JsonResponse({
+                "status" : "not_found"
+            }, status=404)
+
+        if not repo.enabled:
+            return JsonResponse({
+                "status" : "not_found"
+            }, status=404)
+
+        if not repo.public:
+            if not request.user:
+                return JsonResponse({
+                    "status" : "not_found"
+                }, status=404)
+
+            if str(request.user.uuid) != str(user.uuid):
+                return JsonResponse({
+                    "status" : "not_found"
+                }, status=404)
+
+        new_build = Build(
+            repo                = build.repo,
+            ref                 = build.ref,
+            commit              = build.commit,
+            message             = build.message,
+            author_username     = build.author_username,
+            author_display_name = build.author_display_name,
+            status              = "PENDING",
+        )
+        new_build.save()
+        run_pipeline.delay(build_uuid=str(new_build.uuid))
+
+        return JsonResponse({
+            "status"    : "ok",
+            "build_url" : reverse("build_by_uuid", args=[str(new_build.uuid)]),
         })

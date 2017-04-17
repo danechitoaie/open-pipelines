@@ -87,18 +87,23 @@ $(document).ready(function() {
                     if (r.build_status === "INPROGRESS" && r.build_url_more !== null) {
                         setTimeout(updateBuildProgress(codeMirror, r.build_url_more), 1000);
                     }
+                    else {
+                        $opBuild.find(".op__build__info").append(
+                            $("#script-template-build-rerun").html()
+                        );
+                    }
 
                     return;
                 }
 
                 var compileTemplate = _.template($("#script-template-error").html());
-                var $domElement     = $opBuild.find("> .column .op__build__logs > .ui.stacked.segment");
+                var $domElement     = $opBuild.find(".op__build__logs > .ui.stacked.segment");
                 $domElement.html(compileTemplate({
                     "message" : "Error retrieving data about the current build!"
                 }));
             }).fail(function(xhr) {
                 var compileTemplate = _.template($("#script-template-error").html());
-                var $domElement     = $opBuild.find("> .column .op__build__logs > .ui.stacked.segment");
+                var $domElement     = $opBuild.find(".op__build__logs > .ui.stacked.segment");
                 $domElement.html(compileTemplate({
                     "message" : "Error retrieving data about the current build!"
                 }));
@@ -118,7 +123,7 @@ $(document).ready(function() {
                 updateDatetime();
                 setInterval(updateDatetime, 1000);
 
-                var $domElement = $opBuild.find("> .column .op__build__logs > .ui.stacked.segment");
+                var $domElement = $opBuild.find(".op__build__logs > .ui.stacked.segment");
                 $domElement.empty();
 
                 var codeMirror = CodeMirror($domElement.get(0), {
@@ -134,21 +139,56 @@ $(document).ready(function() {
                 if (r.build_status === "INPROGRESS" && r.build_url_more !== null) {
                     setTimeout(updateBuildProgress(codeMirror, r.build_url_more), 1000);
                 }
+                else {
+                    $opBuild.find(".op__build__info").append(
+                        $("#script-template-build-rerun").html()
+                    );
+                }
 
                 return;
             }
 
             var compileTemplate = _.template($("#script-template-error").html());
-            var $domElement     = $opBuild.find("> .column .op__build__logs > .ui.stacked.segment");
+            var $domElement     = $opBuild.find(".op__build__logs > .ui.stacked.segment");
             $domElement.html(compileTemplate({
                 "message" : "Error retrieving data about the current build!"
             }));
         }).fail(function(xhr) {
             var compileTemplate = _.template($("#script-template-error").html());
-            var $domElement     = $opBuild.find("> .column .op__build__logs > .ui.stacked.segment");
+            var $domElement     = $opBuild.find(".op__build__logs > .ui.stacked.segment");
             $domElement.html(compileTemplate({
                 "message" : "Error retrieving data about the current build!"
             }));
         });
     }
+
+    $(document).on("click", ".op__build__rerun > button", function(e) {
+        e.preventDefault();
+
+        $(this).addClass("disabled");
+        $(this).addClass("loading");
+
+        var buildUrl = $opBuild.attr("data-build-url");
+
+        setTimeout(function() {
+            $.post(buildUrl, function(r) {
+                if (r.status === "ok") {
+                    window.location.href = r.build_url;
+                    return;
+                }
+
+                var compileTemplate = _.template($("#script-template-error").html());
+                var $domElement     = $opBuild.find(".op__build__logs > .ui.stacked.segment");
+                $domElement.html(compileTemplate({
+                    "message" : "Error scheduling the build for a rerun!"
+                }));
+            }).fail(function(xhr) {
+                var compileTemplate = _.template($("#script-template-error").html());
+                var $domElement     = $opBuild.find(".op__build__logs > .ui.stacked.segment");
+                $domElement.html(compileTemplate({
+                    "message" : "Error scheduling the build for a rerun!"
+                }));
+            });
+        }, 2000);
+    });
 });
