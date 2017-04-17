@@ -286,6 +286,27 @@ class BitBucketService(object):
 
         return True
 
+    def get_open_pipelines_yml(self, build):
+        repo = build.repo
+        user = repo.user
+
+        self.__refresh_oauth(user)
+
+        try:
+            req = requests.get(
+                url     = "https://api.bitbucket.org/1.0/repositories/{0}/raw/{1}/open_pipelines.yml".format(repo.path, build.commit),
+                headers = {"Authorization" : "Bearer {0}".format(user.service_atoken)}
+            )
+        except Exception as e:
+            self.l.error(e)
+            return None
+
+        if not req.ok:
+            self.l.error("Error retrieving open_pipelines.yml from BitBucket! req=%s", req.text)
+            return None
+
+        return req.text
+
     def get_git_cmds(self, build):
         repo = build.repo
         user = repo.user
@@ -293,7 +314,8 @@ class BitBucketService(object):
         self.__refresh_oauth(user)
 
         cmds = [
-            "git clone https://x-token-auth:$REPOSITORY_OAUTH_ACCESS_TOKEN@bitbucket.org/{0}.git .".format(repo.path),
+            "git clone --quiet https://x-token-auth:$REPOSITORY_OAUTH_ACCESS_TOKEN@bitbucket.org/{0}.git $BUILD_DIR".format(repo.path),
+            "cd $BUILD_DIR",
             "git reset --hard {0}".format(build.commit),
             "git remote set-url origin git@bitbucket.org:{0}.git".format(repo.path),
         ]

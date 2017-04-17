@@ -251,10 +251,33 @@ class GitHubService(object):
 
         return True
 
+    def get_open_pipelines_yml(self, build):
+        repo = build.repo
+        user = repo.user
+
+        try:
+            req = requests.get(
+                url     = "https://api.github.com/repos/{0}/contents/open_pipelines.yml?".format(repo.path) + urlencode({"ref" : build.commit}),
+                headers = {
+                    "Authorization" : "token {0}".format(user.service_atoken),
+                    "Accept"        : "application/vnd.github.v3.raw",
+                }
+            )
+        except Exception as e:
+            self.l.error(e)
+            return None
+
+        if not req.ok:
+            self.l.error("Error retrieving open_pipelines.yml from GitHub! req=%s", req.text)
+            return None
+
+        return req.text
+
     def get_git_cmds(self, build):
         repo = build.repo
         cmds = [
-            "git clone https://$REPOSITORY_OAUTH_ACCESS_TOKEN:x-oauth-basic@github.com/{0}.git .".format(repo.path),
+            "git clone --quiet https://$REPOSITORY_OAUTH_ACCESS_TOKEN:x-oauth-basic@github.com/{0}.git $BUILD_DIR".format(repo.path),
+            "cd $BUILD_DIR",
             "git reset --hard {0}".format(build.commit),
             "git remote set-url origin git@github.com:{0}.git".format(repo.path),
         ]

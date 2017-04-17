@@ -57,61 +57,13 @@ def run_pipeline(build_uuid):
             os.mkdir(pth_sh)
             os.mkdir(pth_ws)
 
-            # GIT step
-            git_SCRIPT, git_SCRIPT_path = tempfile.mkstemp(
-                prefix = "git_",
-                suffix = ".sh",
-                dir    = pth_sh,
-            )
-
-            with open(git_SCRIPT_path, "w") as f:
-                f.write("umask 000")
-                f.write("\n")            
-            
-                for c in service.get_git_cmds(build):
-                    f.write(c)
-                    f.write("\n")
-
-                f.write("chmod 777 $BUILD_DIR")
-                f.write("\n")            
-
             oauth_atoken = urllib.parse.quote(repo_user.service_atoken)
 
-            custom_ENV = os.environ.copy()
-            custom_ENV["REPOSITORY_OAUTH_ACCESS_TOKEN"] = oauth_atoken
-
-            with subprocess.Popen(
-                    args   = ["/bin/bash", "-xe", git_SCRIPT_path],
-                    stdout = subprocess.PIPE,
-                    stderr = subprocess.STDOUT,
-                    env    = custom_ENV,
-                    cwd    = pth_ws,
-                ) as p:
-
-                for line in iter(p.stdout.readline, b""):
-                    build_line = str(line, "utf-8")
-                    build_line = build_line.replace(oauth_atoken, "$REPOSITORY_OAUTH_ACCESS_TOKEN")
-                    build.output += build_line
-
-                build.save(update_fields=["output"])
-
-                if p.wait() != 0:
-                    # Build finished with errors
-                    build.status       = "FAILED"
-                    build.datetime_end = timezone.now()
-                    build.save(update_fields=["status", "datetime_end"])
-
-                    # Build Status = FAILED
-                    service.set_build_status(build, "FAILED")
-
-                    return "FAILED"
-
             # Docker step
-            pth_pipeline_yml = os.path.join(pth_ws, "open_pipelines.yml")
-
-            if not os.path.isfile(pth_pipeline_yml):
+            open_pipelines_yml = service.get_open_pipelines_yml(build)
+            if open_pipelines_yml == None:
                 build.output      += "\n"
-                build.output      += "ERROR: Missing open_pipelines.yml file."
+                build.output      += "ERROR: Failed to get open_pipelines.yml file."
                 build.output      += "\n"
                 build.status       = "FAILED"
                 build.datetime_end = timezone.now()
@@ -122,10 +74,7 @@ def run_pipeline(build_uuid):
 
                 return "FAILED"
 
-            pipeline_yml = None
-            with open(pth_pipeline_yml, "r") as f:
-                pipeline_yml = yaml.safe_load(f)
-
+            pipeline_yml = yaml.safe_load(open_pipelines_yml)
             if type(pipeline_yml) != dict:
                 build.output      += "\n"
                 build.output      += "ERROR: Failed to parse open_pipelines.yml file."
@@ -142,10 +91,7 @@ def run_pipeline(build_uuid):
             pipeline_yml_image    = pipeline_yml.get("image")
             pipeline_yml_pipeline = pipeline_yml.get("pipeline")
 
-            if any([
-                    type(pipeline_yml_image)    != str,
-                    type(pipeline_yml_pipeline) != list,
-                ]):
+            if any([type(pipeline_yml_image) != str, type(pipeline_yml_pipeline) != list]):
                 build.output      += "\n"
                 build.output      += "ERROR: Failed to parse open_pipelines.yml file."
                 build.output      += "\n"
@@ -168,6 +114,16 @@ def run_pipeline(build_uuid):
             )
 
             with open(pipeline_SCRIPT_path, "w") as f:
+                f.write("umask 000")
+                f.write("\n")
+
+                for c in service.get_git_cmds(build):
+                    f.write(c)
+                    f.write("\n")
+
+                f.write("chmod 777 $BUILD_DIR")
+                f.write("\n")
+
                 for c in pipeline_yml_pipeline:
                     f.write(c)
                     f.write("\n")
@@ -181,15 +137,33 @@ def run_pipeline(build_uuid):
                 working_dir = pth_ws,
                 entrypoint  = ["/bin/bash", "-xe"],
                 command     = pipeline_SCRIPT_path,
+                environment = ["REPOSITORY_OAUTH_ACCESS_TOKEN={0}".format(oauth_atoken), "BUILD_DIR={0}".format(pth_ws)],
                 volumes     = {
                     pth_ws               : {"bind" : pth_ws              , "mode" : "rw"},
                     pipeline_SCRIPT_path : {"bind" : pipeline_SCRIPT_path, "mode" : "ro"},
                 },
             )
 
+            tmp_buffer = ""
             for line in docker_container.logs(stream=True):
-                build.output += line
-                build.save(update_fields=["output"])
+                tmp_buffer += line
+                if tmp_buffer.count("\n") >= 20:
+                    buff_index    = tmp_buffer.rfind("\n")
+                    split_pos     = buff_index + 1
+
+                    build_output  = tmp_buffer[:split_pos]
+                    build_output  = build_output.replace(oauth_atoken, "$REPOSITORY_OAUTH_ACCESS_TOKEN")
+                    build_output  = build_output.replace(pth_ws, "$BUILD_DIR")
+                    build.output += build_output
+
+                    tmp_buffer    = tmp_buffer[split_pos:]
+                    build.save(update_fields=["output"])
+
+            build_output  = tmp_buffer
+            build_output  = build_output.replace(oauth_atoken, "$REPOSITORY_OAUTH_ACCESS_TOKEN")
+            build_output  = build_output.replace(pth_ws, "$BUILD_DIR")
+            build.output += build_output
+            build.save(update_fields=["output"])
 
             docker_rcode = docker_container.wait()
             docker_container.remove()
